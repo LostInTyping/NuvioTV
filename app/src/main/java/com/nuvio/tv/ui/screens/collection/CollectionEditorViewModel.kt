@@ -206,6 +206,24 @@ class CollectionEditorViewModel @Inject constructor(
         }
     }
 
+    fun updateFolderBackdropImageUrl(url: String) {
+        _uiState.update { state ->
+            state.copy(editingFolder = state.editingFolder?.copy(backdropImageUrl = url.ifBlank { null }))
+        }
+    }
+
+    fun updateFolderBackdropAnimatedUrl(url: String) {
+        _uiState.update { state ->
+            state.copy(editingFolder = state.editingFolder?.copy(backdropAnimatedUrl = url.ifBlank { null }))
+        }
+    }
+
+    fun updateFolderBackdropAnimatedEnabled(enabled: Boolean) {
+        _uiState.update { state ->
+            state.copy(editingFolder = state.editingFolder?.copy(backdropAnimatedEnabled = enabled))
+        }
+    }
+
     fun updateFolderCoverEmoji(emoji: String) {
         _uiState.update { state ->
             state.copy(editingFolder = state.editingFolder?.copy(
