@@ -832,6 +832,66 @@ private fun FolderEditorContent(
                         )
                     }
                 }
+
+                // Backdrop section
+                Spacer(modifier = Modifier.height(20.dp))
+                Text(
+                    stringResource(R.string.collections_editor_folder_backdrop),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = NuvioColors.TextSecondary
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+                NuvioTextField(
+                    value = folder.backdropImageUrl.orEmpty(),
+                    onValueChange = { viewModel.updateFolderBackdropImageUrl(it) },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = stringResource(R.string.collections_editor_placeholder_folder_backdrop)
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+                NuvioTextField(
+                    value = folder.backdropAnimatedUrl.orEmpty(),
+                    onValueChange = { viewModel.updateFolderBackdropAnimatedUrl(it) },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = stringResource(R.string.collections_editor_placeholder_folder_backdrop_animated)
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+                Card(
+                    onClick = { viewModel.updateFolderBackdropAnimatedEnabled(!folder.backdropAnimatedEnabled) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.colors(
+                        containerColor = NuvioColors.BackgroundCard,
+                        focusedContainerColor = NuvioColors.FocusBackground
+                    ),
+                    border = CardDefaults.border(
+                        focusedBorder = Border(
+                            border = BorderStroke(2.dp, NuvioColors.FocusRing),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                    ),
+                    scale = CardDefaults.scale(focusedScale = 1f),
+                    shape = CardDefaults.shape(RoundedCornerShape(12.dp))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            stringResource(R.string.collections_editor_play_backdrop_animated),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = NuvioColors.TextPrimary
+                        )
+                        Switch(
+                            checked = folder.backdropAnimatedEnabled,
+                            onCheckedChange = { viewModel.updateFolderBackdropAnimatedEnabled(it) }
+                        )
+                    }
+                }
             }
 
             item {
