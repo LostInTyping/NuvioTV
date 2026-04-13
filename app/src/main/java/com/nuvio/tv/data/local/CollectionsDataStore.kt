@@ -189,6 +189,9 @@ class CollectionsDataStore @Inject constructor(
         val coverEmoji: String? = null,
         val tileShape: String = "SQUARE",
         val hideTitle: Boolean = false,
+        val backdropImageUrl: String? = null,
+        val backdropAnimatedUrl: String? = null,
+        val backdropAnimatedEnabled: Boolean? = null,
         val catalogSources: List<SerializableCatalogSource> = emptyList()
     )
 
@@ -218,6 +221,9 @@ class CollectionsDataStore @Inject constructor(
                 coverEmoji = folder.coverEmoji,
                 tileShape = folder.tileShape.name,
                 hideTitle = folder.hideTitle,
+                backdropImageUrl = folder.backdropImageUrl,
+                backdropAnimatedUrl = folder.backdropAnimatedUrl,
+                backdropAnimatedEnabled = folder.backdropAnimatedEnabled,
                 catalogSources = folder.catalogSources.map { source ->
                     SerializableCatalogSource(
                         addonId = source.addonId,
@@ -248,6 +254,9 @@ class CollectionsDataStore @Inject constructor(
                 coverEmoji = folder.coverEmoji,
                 tileShape = PosterShape.fromString(folder.tileShape),
                 hideTitle = folder.hideTitle,
+                backdropImageUrl = folder.backdropImageUrl,
+                backdropAnimatedUrl = folder.backdropAnimatedUrl,
+                backdropAnimatedEnabled = folder.backdropAnimatedEnabled ?: true,
                 catalogSources = folder.catalogSources.map { source ->
                     CollectionCatalogSource(
                         addonId = source.addonId,
