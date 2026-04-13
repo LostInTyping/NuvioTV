@@ -15,6 +15,7 @@ import com.nuvio.tv.domain.model.PosterShape
 import com.nuvio.tv.ui.util.localizeEpisodeTitle
 import com.nuvio.tv.domain.model.MetaPreview
 import com.nuvio.tv.R
+import com.nuvio.tv.ui.components.collectionFolderBackdropUrl
 import com.nuvio.tv.ui.components.formatContinueWatchingProgressLabel
 
 internal val YEAR_REGEX = Regex("""\b(19|20)\d{2}\b""")
@@ -471,6 +472,8 @@ internal fun buildCollectionFolderItem(
     } else {
         imageUrl
     }
+    val heroBackdrop = collectionFolderBackdropUrl(folder)
+        ?: firstNonBlank(folder.coverImageUrl, collection.backdropImageUrl)
 
     return ModernCarouselItem(
         key = "collection_${collection.id}_${folder.id}_$occurrence",
@@ -486,7 +489,7 @@ internal fun buildCollectionFolderItem(
             imdbText = null,
             genres = emptyList(),
             poster = imageUrl,
-            backdrop = firstNonBlank(folder.coverImageUrl, collection.backdropImageUrl),
+            backdrop = heroBackdrop,
             imageUrl = heroImageUrl
         ),
         payload = ModernPayload.CollectionFolder(

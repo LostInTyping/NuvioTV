@@ -19,6 +19,9 @@ data class CollectionFolder(
     val coverEmoji: String? = null,
     val tileShape: PosterShape = PosterShape.SQUARE,
     val hideTitle: Boolean = false,
+    val backdropImageUrl: String? = null,
+    val backdropAnimatedUrl: String? = null,
+    val backdropAnimatedEnabled: Boolean = true,
     val catalogSources: List<CollectionCatalogSource> = emptyList()
 )
 

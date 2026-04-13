@@ -16,6 +16,13 @@ fun collectionFolderCardImageUrl(
     }
 }
 
+fun collectionFolderBackdropUrl(folder: CollectionFolder): String? {
+    if (!folder.backdropAnimatedEnabled) {
+        return firstNonBlank(folder.backdropImageUrl)
+    }
+    return firstNonBlank(folder.backdropAnimatedUrl, folder.backdropImageUrl)
+}
+
 private fun firstNonBlank(vararg candidates: String?): String? {
     return candidates.firstOrNull { !it.isNullOrBlank() }?.trim()
 }
