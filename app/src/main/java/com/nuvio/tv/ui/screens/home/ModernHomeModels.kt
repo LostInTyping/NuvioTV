@@ -51,6 +51,7 @@ data class HeroPreview(
     val poster: String?,
     val backdrop: String?,
     val imageUrl: String?,
+    val backdropPlayOnce: Boolean = false,
     /** Snapshot of the backdrop URL captured before TMDB enrichment.
      *  Survives cache rebuilds so landscape cards keep their original art
      *  even after navigation away and back. */
@@ -79,7 +80,8 @@ sealed class ModernPayload {
         val posterShape: PosterShape,
         val focusGlowEnabled: Boolean,
         val focusGifEnabled: Boolean,
-        val focusGifUrl: String?
+        val focusGifUrl: String?,
+        val focusGifPlayOnce: Boolean
     ) : ModernPayload()
 }
 
@@ -144,6 +146,7 @@ data class ModernHomePresentationState(
 @Immutable
 internal data class ModernHeroSceneState(
     val heroBackdrop: String?,
+    val heroBackdropPlayOnce: Boolean,
     val preview: HeroPreview?,
     val enrichmentActive: Boolean,
     val shouldPlayTrailer: Boolean,
@@ -490,6 +493,7 @@ internal fun buildCollectionFolderItem(
             genres = emptyList(),
             poster = imageUrl,
             backdrop = heroBackdrop,
+            backdropPlayOnce = folder.backdropAnimatedPlayOnce,
             imageUrl = heroImageUrl
         ),
         payload = ModernPayload.CollectionFolder(
@@ -500,7 +504,8 @@ internal fun buildCollectionFolderItem(
             posterShape = folder.tileShape,
             focusGlowEnabled = collection.focusGlowEnabled,
             focusGifEnabled = folder.focusGifEnabled,
-            focusGifUrl = folder.focusGifUrl
+            focusGifUrl = folder.focusGifUrl,
+            focusGifPlayOnce = folder.focusGifPlayOnce
         )
     )
 }
