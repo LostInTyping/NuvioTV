@@ -16,12 +16,14 @@ data class CollectionFolder(
     val coverImageUrl: String? = null,
     val focusGifUrl: String? = null,
     val focusGifEnabled: Boolean = true,
+    val focusGifPlayOnce: Boolean = true,
     val coverEmoji: String? = null,
     val tileShape: PosterShape = PosterShape.SQUARE,
     val hideTitle: Boolean = false,
     val backdropImageUrl: String? = null,
     val backdropAnimatedUrl: String? = null,
     val backdropAnimatedEnabled: Boolean = true,
+    val backdropAnimatedPlayOnce: Boolean = true,
     val catalogSources: List<CollectionCatalogSource> = emptyList()
 )
 
