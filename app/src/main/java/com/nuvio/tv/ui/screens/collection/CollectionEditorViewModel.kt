@@ -198,6 +198,12 @@ class CollectionEditorViewModel @Inject constructor(
         }
     }
 
+    fun updateFolderFocusGifPlayOnce(playOnce: Boolean) {
+        _uiState.update { state ->
+            state.copy(editingFolder = state.editingFolder?.copy(focusGifPlayOnce = playOnce))
+        }
+    }
+
     fun updateFolderBackdropImageUrl(url: String) {
         _uiState.update { state ->
             state.copy(editingFolder = state.editingFolder?.copy(backdropImageUrl = url.ifBlank { null }))
@@ -213,6 +219,12 @@ class CollectionEditorViewModel @Inject constructor(
     fun updateFolderBackdropAnimatedEnabled(enabled: Boolean) {
         _uiState.update { state ->
             state.copy(editingFolder = state.editingFolder?.copy(backdropAnimatedEnabled = enabled))
+        }
+    }
+
+    fun updateFolderBackdropAnimatedPlayOnce(playOnce: Boolean) {
+        _uiState.update { state ->
+            state.copy(editingFolder = state.editingFolder?.copy(backdropAnimatedPlayOnce = playOnce))
         }
     }
 
