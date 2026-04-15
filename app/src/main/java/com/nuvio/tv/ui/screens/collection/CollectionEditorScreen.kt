@@ -833,6 +833,42 @@ private fun FolderEditorContent(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(12.dp))
+                Card(
+                    onClick = { viewModel.updateFolderFocusGifPlayOnce(!folder.focusGifPlayOnce) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.colors(
+                        containerColor = NuvioColors.BackgroundCard,
+                        focusedContainerColor = NuvioColors.FocusBackground
+                    ),
+                    border = CardDefaults.border(
+                        focusedBorder = Border(
+                            border = BorderStroke(2.dp, NuvioColors.FocusRing),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                    ),
+                    scale = CardDefaults.scale(focusedScale = 1f),
+                    shape = CardDefaults.shape(RoundedCornerShape(12.dp))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            stringResource(R.string.collections_editor_play_once),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = NuvioColors.TextPrimary
+                        )
+                        Switch(
+                            checked = folder.focusGifPlayOnce,
+                            onCheckedChange = { viewModel.updateFolderFocusGifPlayOnce(it) }
+                        )
+                    }
+                }
+
                 // Backdrop section
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
@@ -889,6 +925,42 @@ private fun FolderEditorContent(
                         Switch(
                             checked = folder.backdropAnimatedEnabled,
                             onCheckedChange = { viewModel.updateFolderBackdropAnimatedEnabled(it) }
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+                Card(
+                    onClick = { viewModel.updateFolderBackdropAnimatedPlayOnce(!folder.backdropAnimatedPlayOnce) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.colors(
+                        containerColor = NuvioColors.BackgroundCard,
+                        focusedContainerColor = NuvioColors.FocusBackground
+                    ),
+                    border = CardDefaults.border(
+                        focusedBorder = Border(
+                            border = BorderStroke(2.dp, NuvioColors.FocusRing),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                    ),
+                    scale = CardDefaults.scale(focusedScale = 1f),
+                    shape = CardDefaults.shape(RoundedCornerShape(12.dp))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            stringResource(R.string.collections_editor_play_once),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = NuvioColors.TextPrimary
+                        )
+                        Switch(
+                            checked = folder.backdropAnimatedPlayOnce,
+                            onCheckedChange = { viewModel.updateFolderBackdropAnimatedPlayOnce(it) }
                         )
                     }
                 }
