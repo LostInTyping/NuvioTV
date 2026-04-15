@@ -186,12 +186,14 @@ class CollectionsDataStore @Inject constructor(
         val coverImageUrl: String? = null,
         val focusGifUrl: String? = null,
         val focusGifEnabled: Boolean? = null,
+        val focusGifPlayOnce: Boolean? = null,
         val coverEmoji: String? = null,
         val tileShape: String = "SQUARE",
         val hideTitle: Boolean = false,
         val backdropImageUrl: String? = null,
         val backdropAnimatedUrl: String? = null,
         val backdropAnimatedEnabled: Boolean? = null,
+        val backdropAnimatedPlayOnce: Boolean? = null,
         val catalogSources: List<SerializableCatalogSource> = emptyList()
     )
 
@@ -217,12 +219,14 @@ class CollectionsDataStore @Inject constructor(
                 coverImageUrl = folder.coverImageUrl,
                 focusGifUrl = folder.focusGifUrl,
                 focusGifEnabled = folder.focusGifEnabled,
+                focusGifPlayOnce = folder.focusGifPlayOnce,
                 coverEmoji = folder.coverEmoji,
                 tileShape = folder.tileShape.name,
                 hideTitle = folder.hideTitle,
                 backdropImageUrl = folder.backdropImageUrl,
                 backdropAnimatedUrl = folder.backdropAnimatedUrl,
                 backdropAnimatedEnabled = folder.backdropAnimatedEnabled,
+                backdropAnimatedPlayOnce = folder.backdropAnimatedPlayOnce,
                 catalogSources = folder.catalogSources.map { source ->
                     SerializableCatalogSource(
                         addonId = source.addonId,
@@ -249,12 +253,14 @@ class CollectionsDataStore @Inject constructor(
                 coverImageUrl = folder.coverImageUrl,
                 focusGifUrl = folder.focusGifUrl,
                 focusGifEnabled = folder.focusGifEnabled ?: true,
+                focusGifPlayOnce = folder.focusGifPlayOnce ?: true,
                 coverEmoji = folder.coverEmoji,
                 tileShape = PosterShape.fromString(folder.tileShape),
                 hideTitle = folder.hideTitle,
                 backdropImageUrl = folder.backdropImageUrl,
                 backdropAnimatedUrl = folder.backdropAnimatedUrl,
                 backdropAnimatedEnabled = folder.backdropAnimatedEnabled ?: true,
+                backdropAnimatedPlayOnce = folder.backdropAnimatedPlayOnce ?: true,
                 catalogSources = folder.catalogSources.map { source ->
                     CollectionCatalogSource(
                         addonId = source.addonId,
