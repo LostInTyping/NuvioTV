@@ -1508,6 +1508,7 @@
     <string name="collections_editor_folder_backdrop_url">Backdrop Image URL</string>
     <string name="collections_editor_folder_backdrop_animated">Animated Backdrop URL</string>
     <string name="collections_editor_play_backdrop_animated">Play Animated Backdrop on Focus</string>
+    <string name="collections_editor_play_once">Play Once</string>
     <string name="collections_editor_placeholder_folder_backdrop">Static backdrop image URL (optional)</string>
     <string name="collections_editor_placeholder_folder_backdrop_animated">Animated backdrop URL (plays in hero on focus)</string>
     <string name="collections_card_title">Collections</string>
