@@ -18,10 +18,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import coil.request.repeatCount
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,6 +72,7 @@ internal fun ModernHeroScene(
 ) {
     ModernHeroMediaLayer(
         heroBackdrop = state.heroBackdrop,
+        heroBackdropPlayOnce = state.heroBackdropPlayOnce,
         enrichmentActive = state.enrichmentActive,
         shouldPlayHeroTrailer = state.shouldPlayTrailer,
         heroTrailerFirstFrameRendered = state.trailerFirstFrameRendered,
@@ -91,6 +95,7 @@ internal fun ModernHeroScene(
 @Composable
 internal fun ModernHeroMediaLayer(
     heroBackdrop: String?,
+    heroBackdropPlayOnce: Boolean,
     enrichmentActive: Boolean,
     shouldPlayHeroTrailer: Boolean,
     heroTrailerFirstFrameRendered: Boolean,
@@ -115,10 +120,21 @@ internal fun ModernHeroMediaLayer(
     var stableBackdrop by remember { mutableStateOf(heroBackdrop) }
     if (!enrichmentActive) stableBackdrop = heroBackdrop
 
-    val imageModel = remember(localContext, stableBackdrop, requestWidthPx, requestHeightPx) {
+    var heroSessionKey by remember { mutableIntStateOf(0) }
+    LaunchedEffect(stableBackdrop) {
+        heroSessionKey++
+    }
+
+    val imageModel = remember(localContext, stableBackdrop, requestWidthPx, requestHeightPx, heroSessionKey, heroBackdropPlayOnce) {
         ImageRequest.Builder(localContext)
             .data(stableBackdrop)
             .crossfade(400)
+            .apply {
+                if (heroBackdropPlayOnce) {
+                    repeatCount(0)
+                    memoryCacheKey("hero_${stableBackdrop}_${requestWidthPx}x${requestHeightPx}_session$heroSessionKey")
+                }
+            }
             .size(width = requestWidthPx, height = requestHeightPx)
             .build()
     }

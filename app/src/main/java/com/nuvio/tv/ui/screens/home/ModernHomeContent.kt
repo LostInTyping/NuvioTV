@@ -760,6 +760,9 @@ fun ModernHomeContent(
                 if (heroItem == null) activeRowFallbackBackdrop else null
             )
         }
+        val heroBackdropPlayOnce = remember(resolvedHero) {
+            resolvedHero?.backdropPlayOnce ?: false
+        }
         val expandedFocusedSelection = remember(focusedCatalogSelection, expandedCatalogFocusKey) {
             focusedCatalogSelection?.takeIf { it.focusKey == expandedCatalogFocusKey }
         }
@@ -802,6 +805,7 @@ fun ModernHomeContent(
         }
         val liveHeroSceneState = remember(
             heroBackdrop,
+            heroBackdropPlayOnce,
             resolvedHero,
             enrichmentActive,
             shouldPlayHeroTrailer,
@@ -813,6 +817,7 @@ fun ModernHomeContent(
         ) {
             ModernHeroSceneState(
                 heroBackdrop = heroBackdrop,
+                heroBackdropPlayOnce = heroBackdropPlayOnce,
                 preview = if (enrichmentActive) null else resolvedHero,
                 enrichmentActive = enrichmentActive,
                 shouldPlayTrailer = shouldPlayHeroTrailer,
