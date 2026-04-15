@@ -33,6 +33,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -90,6 +91,8 @@ import com.nuvio.tv.ui.theme.NuvioColors
 import kotlin.math.abs
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
+import com.nuvio.tv.ui.components.ANIMATED_FOCUS_DEBOUNCE_MS
+import com.nuvio.tv.ui.components.buildAnimatedFocusRequest
 
 private const val MODERN_HORIZONTAL_FOCUS_DEBOUNCE_MS = 140L
 private const val POSTER_PREFETCH_DISTANCE = 8
@@ -765,6 +768,13 @@ private fun ModernCarouselCard(
     }
     val effectiveBackdropUrl = frozenBackdropUrl.value
     var isFocused by remember { mutableStateOf(false) }
+    var focusSessionKey by remember { mutableIntStateOf(0) }
+    LaunchedEffect(isFocused) {
+        if (isFocused) {
+            delay(ANIMATED_FOCUS_DEBOUNCE_MS)
+            focusSessionKey++
+        }
+    }
     val payload = item.payload as? ModernPayload.CollectionFolder
     val baseImageUrl = if (focusedPosterBackdropExpandEnabled && isBackdropExpanded) {
         item.heroPreview.backdrop ?: item.imageUrl ?: item.heroPreview.poster
@@ -796,14 +806,26 @@ private fun ModernCarouselCard(
     val requestHeightPx = remember(cardHeight, density) {
         with(density) { cardHeight.roundToPx() }
     }
-    val imageModel = remember(context, imageUrl, requestWidthPx, requestHeightPx) {
+    val usePlayOnce = payload?.focusGifPlayOnce == true && payload.focusGifEnabled
+    val imageModel = remember(context, imageUrl, requestWidthPx, requestHeightPx, focusSessionKey, usePlayOnce) {
         imageUrl?.let {
-            ImageRequest.Builder(context)
-                .data(it)
-                .crossfade(false)
-                .memoryCacheKey("${it}_${requestWidthPx}x${requestHeightPx}")
-                .size(width = requestWidthPx, height = requestHeightPx)
-                .build()
+            if (usePlayOnce && isFocused && it == payload?.focusGifUrl) {
+                buildAnimatedFocusRequest(
+                    context = context,
+                    url = it,
+                    playOnce = true,
+                    focusSessionKey = focusSessionKey,
+                    width = requestWidthPx,
+                    height = requestHeightPx
+                )
+            } else {
+                ImageRequest.Builder(context)
+                    .data(it)
+                    .crossfade(false)
+                    .memoryCacheKey("${it}_${requestWidthPx}x${requestHeightPx}")
+                    .size(width = requestWidthPx, height = requestHeightPx)
+                    .build()
+            }
         }
     }
     val logoHeight = cardHeight * 0.34f
