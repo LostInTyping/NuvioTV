@@ -541,12 +541,14 @@ class AddonManagerViewModel @Inject constructor(
                         coverImageUrl = folder.coverImageUrl,
                         focusGifUrl = folder.focusGifUrl,
                         focusGifEnabled = folder.focusGifEnabled,
+                        focusGifPlayOnce = folder.focusGifPlayOnce,
                         coverEmoji = folder.coverEmoji,
                         tileShape = folder.tileShape.name,
                         hideTitle = folder.hideTitle,
                         backdropImageUrl = folder.backdropImageUrl,
                         backdropAnimatedUrl = folder.backdropAnimatedUrl,
                         backdropAnimatedEnabled = folder.backdropAnimatedEnabled,
+                        backdropAnimatedPlayOnce = folder.backdropAnimatedPlayOnce,
                         catalogSources = folder.catalogSources.map { src ->
                             AddonConfigServer.CatalogSourceInfo(
                                 addonId = src.addonId,

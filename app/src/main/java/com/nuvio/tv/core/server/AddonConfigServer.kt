@@ -63,12 +63,14 @@ class AddonConfigServer(
         val coverImageUrl: String?,
         val focusGifUrl: String?,
         val focusGifEnabled: Boolean = true,
+        val focusGifPlayOnce: Boolean = true,
         val coverEmoji: String?,
         val tileShape: String,
         val hideTitle: Boolean,
         val backdropImageUrl: String? = null,
         val backdropAnimatedUrl: String? = null,
         val backdropAnimatedEnabled: Boolean = true,
+        val backdropAnimatedPlayOnce: Boolean = true,
         val catalogSources: List<CatalogSourceInfo>
     )
 
