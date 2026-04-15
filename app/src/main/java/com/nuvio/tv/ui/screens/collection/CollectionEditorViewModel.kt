@@ -397,7 +397,9 @@ class CollectionEditorViewModel @Inject constructor(
         if (rawFolder.catalogSources.isEmpty()) return
         val cleanedFolder = rawFolder.copy(
             title = rawFolder.title.ifBlank { "Untitled" },
-            coverImageUrl = rawFolder.coverImageUrl?.ifBlank { null }
+            coverImageUrl = rawFolder.coverImageUrl?.ifBlank { null },
+            backdropImageUrl = rawFolder.backdropImageUrl?.ifBlank { null },
+            backdropAnimatedUrl = rawFolder.backdropAnimatedUrl?.ifBlank { null }
         )
         val editingFolder = cleanedFolder
         _uiState.update { state ->
