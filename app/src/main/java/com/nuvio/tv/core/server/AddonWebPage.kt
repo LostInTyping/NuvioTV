@@ -1044,6 +1044,7 @@ var i18n = {
   folderBackdrop: '${context.getString(R.string.collections_editor_folder_backdrop).replace("'", "\\'")}',
   folderBackdropAnimated: '${context.getString(R.string.collections_editor_folder_backdrop_animated).replace("'", "\\'")}',
   playBackdropAnimated: '${context.getString(R.string.collections_editor_play_backdrop_animated).replace("'", "\\'")}',
+  playOnce: '${context.getString(R.string.collections_editor_play_once).replace("'", "\\'")}',
   tileShape: '${context.getString(R.string.collections_editor_tile_shape).replace("'", "\\'")}',
   hideTitle: '${context.getString(R.string.collections_editor_hide_title).replace("'", "\\'")}',
   catalogs: '${context.getString(R.string.collections_editor_catalogs).replace("'", "\\'")}',
@@ -1718,7 +1719,7 @@ function updateCollectionTitle(ci, val) {
 }
 
 function addFolder(ci) {
-  collections[ci].folders.push({ id: generateId(), title: 'New Folder', coverImageUrl: null, focusGifUrl: null, focusGifEnabled: true, coverEmoji: null, tileShape: 'SQUARE', hideTitle: false, backdropImageUrl: null, backdropAnimatedUrl: null, backdropAnimatedEnabled: true, catalogSources: [] });
+  collections[ci].folders.push({ id: generateId(), title: 'New Folder', coverImageUrl: null, focusGifUrl: null, focusGifEnabled: true, focusGifPlayOnce: true, coverEmoji: null, tileShape: 'SQUARE', hideTitle: false, backdropImageUrl: null, backdropAnimatedUrl: null, backdropAnimatedEnabled: true, backdropAnimatedPlayOnce: true, catalogSources: [] });
   expandedFolder = ci + '-' + (collections[ci].folders.length - 1);
   renderCollections();
 }
@@ -1773,6 +1774,14 @@ function updateFolderBackdropAnimatedUrl(ci, fi, val) {
 
 function updateFolderBackdropAnimatedEnabled(ci, fi, checked) {
   collections[ci].folders[fi].backdropAnimatedEnabled = checked;
+}
+
+function updateFolderFocusGifPlayOnce(ci, fi, checked) {
+  collections[ci].folders[fi].focusGifPlayOnce = checked;
+}
+
+function updateFolderBackdropAnimatedPlayOnce(ci, fi, checked) {
+  collections[ci].folders[fi].backdropAnimatedPlayOnce = checked;
 }
 
 function updateFolderCoverEmoji(ci, fi, val) {
@@ -2081,6 +2090,14 @@ function renderCollections() {
                 '</label>' +
               '</div>' +
               '<div class="folder-setting-item">' +
+                '<span class="toggle-label">' + i18n.playOnce + '</span>' +
+                '<label class="toggle-switch">' +
+                  '<input type="checkbox"' + (folder.focusGifPlayOnce !== false ? ' checked' : '') + ' onchange="updateFolderFocusGifPlayOnce(' + ci + ',' + fi + ',this.checked)">' +
+                  '<span class="toggle-track"></span>' +
+                  '<span class="toggle-thumb"></span>' +
+                '</label>' +
+              '</div>' +
+              '<div class="folder-setting-item">' +
                 '<input type="url" placeholder="Backdrop image URL (optional)" value="' + escapeAttr(folder.backdropImageUrl || '') + '" oninput="updateFolderBackdropImageUrl(' + ci + ',' + fi + ',this.value)">' +
               '</div>' +
               '<div class="folder-setting-item">' +
@@ -2090,6 +2107,14 @@ function renderCollections() {
                 '<span class="toggle-label">' + i18n.playBackdropAnimated + '</span>' +
                 '<label class="toggle-switch">' +
                   '<input type="checkbox"' + (folder.backdropAnimatedEnabled !== false ? ' checked' : '') + ' onchange="updateFolderBackdropAnimatedEnabled(' + ci + ',' + fi + ',this.checked)">' +
+                  '<span class="toggle-track"></span>' +
+                  '<span class="toggle-thumb"></span>' +
+                '</label>' +
+              '</div>' +
+              '<div class="folder-setting-item">' +
+                '<span class="toggle-label">' + i18n.playOnce + '</span>' +
+                '<label class="toggle-switch">' +
+                  '<input type="checkbox"' + (folder.backdropAnimatedPlayOnce !== false ? ' checked' : '') + ' onchange="updateFolderBackdropAnimatedPlayOnce(' + ci + ',' + fi + ',this.checked)">' +
                   '<span class="toggle-track"></span>' +
                   '<span class="toggle-thumb"></span>' +
                 '</label>' +
