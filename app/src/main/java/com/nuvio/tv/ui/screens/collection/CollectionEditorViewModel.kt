@@ -222,12 +222,6 @@ class CollectionEditorViewModel @Inject constructor(
         }
     }
 
-    fun updateFolderBackdropImageUrl(url: String) {
-        _uiState.update { state ->
-            state.copy(editingFolder = state.editingFolder?.copy(backdropImageUrl = url.ifBlank { null }))
-        }
-    }
-
     fun updateFolderCoverEmoji(emoji: String) {
         _uiState.update { state ->
             state.copy(editingFolder = state.editingFolder?.copy(
@@ -272,6 +266,18 @@ class CollectionEditorViewModel @Inject constructor(
     fun updateFolderHideTitle(hide: Boolean) {
         _uiState.update { state ->
             state.copy(editingFolder = state.editingFolder?.copy(hideTitle = hide))
+        }
+    }
+
+    fun updateFolderHeroBackdropUrl(url: String) {
+        _uiState.update { state ->
+            state.copy(editingFolder = state.editingFolder?.copy(heroBackdropUrl = url.ifBlank { null }))
+        }
+    }
+
+    fun updateFolderTitleLogoUrl(url: String) {
+        _uiState.update { state ->
+            state.copy(editingFolder = state.editingFolder?.copy(titleLogoUrl = url.ifBlank { null }))
         }
     }
 
@@ -402,7 +408,8 @@ class CollectionEditorViewModel @Inject constructor(
         val cleanedFolder = rawFolder.copy(
             title = rawFolder.title.ifBlank { "Untitled" },
             coverImageUrl = rawFolder.coverImageUrl?.ifBlank { null },
-            backdropImageUrl = rawFolder.backdropImageUrl?.ifBlank { null }
+            heroBackdropUrl = rawFolder.heroBackdropUrl?.ifBlank { null },
+            titleLogoUrl = rawFolder.titleLogoUrl?.ifBlank { null }
         )
         val editingFolder = cleanedFolder
         _uiState.update { state ->

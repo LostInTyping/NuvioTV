@@ -83,7 +83,7 @@ import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Switch
 import androidx.tv.material3.SwitchDefaults
 import androidx.tv.material3.Text
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.nuvio.tv.R
 import com.nuvio.tv.domain.model.CollectionCatalogSource
 import com.nuvio.tv.domain.model.CollectionFolder
@@ -692,7 +692,7 @@ private fun FolderEditorContent(
         val canSave = folder.catalogSources.isNotEmpty()
 
         val resolvedHeroUrl = firstNonBlank(
-            folder.backdropImageUrl,
+            folder.heroBackdropUrl,
             folder.coverImageUrl,
             uiState.backdropImageUrl.ifBlank { null }
         )
@@ -771,7 +771,7 @@ private fun FolderEditorContent(
                     onCoverUrlChange = { viewModel.updateFolderCoverImage(it) },
                     onGifUrlChange = { viewModel.updateFolderFocusGifUrl(it) },
                     onGifEnabledChange = { viewModel.updateFolderFocusGifEnabled(it) },
-                    onBackdropUrlChange = { viewModel.updateFolderBackdropImageUrl(it) },
+                    onBackdropUrlChange = { viewModel.updateFolderHeroBackdropUrl(it) },
                     onTileShape = { viewModel.updateFolderTileShape(it) }
                 )
             }
@@ -1140,7 +1140,7 @@ private fun FolderBackdropBlock(
     )
     Spacer(modifier = Modifier.height(8.dp))
     NuvioTextField(
-        value = folder.backdropImageUrl.orEmpty(),
+        value = folder.heroBackdropUrl.orEmpty(),
         onValueChange = onUrlChange,
         modifier = Modifier.fillMaxWidth(),
         placeholder = stringResource(R.string.collections_editor_placeholder_folder_backdrop)

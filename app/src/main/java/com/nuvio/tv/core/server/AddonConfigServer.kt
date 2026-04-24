@@ -66,7 +66,8 @@ class AddonConfigServer(
         val coverEmoji: String?,
         val tileShape: String,
         val hideTitle: Boolean,
-        val backdropImageUrl: String? = null,
+        val heroBackdropUrl: String? = null,
+        val titleLogoUrl: String? = null,
         val catalogSources: List<CatalogSourceInfo>
     )
 

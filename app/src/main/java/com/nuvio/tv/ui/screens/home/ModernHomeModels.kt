@@ -79,7 +79,9 @@ sealed class ModernPayload {
         val posterShape: PosterShape,
         val focusGlowEnabled: Boolean,
         val focusGifEnabled: Boolean,
-        val focusGifUrl: String?
+        val focusGifUrl: String?,
+        val heroBackdropUrl: String?,
+        val titleLogoUrl: String?
     ) : ModernPayload()
 }
 
@@ -498,12 +500,12 @@ internal fun buildCollectionFolderItem(
         folder.title
     }
     val imageUrl = firstNonBlank(folder.coverImageUrl, collection.backdropImageUrl)
+    val heroBackdrop = firstNonBlank(folder.heroBackdropUrl, folder.coverImageUrl, collection.backdropImageUrl)
     val heroImageUrl = if (useLandscapePosters) {
-        firstNonBlank(folder.coverImageUrl, collection.backdropImageUrl)
+        firstNonBlank(folder.heroBackdropUrl, folder.coverImageUrl, collection.backdropImageUrl)
     } else {
         imageUrl
     }
-    val heroBackdrop = firstNonBlank(folder.backdropImageUrl, folder.coverImageUrl, collection.backdropImageUrl)
 
     return ModernCarouselItem(
         key = "collection_${collection.id}_${folder.id}_$occurrence",
@@ -512,7 +514,7 @@ internal fun buildCollectionFolderItem(
         imageUrl = heroImageUrl,
         heroPreview = HeroPreview(
             title = if (folder.hideTitle) "" else title,
-            logo = null,
+            logo = folder.titleLogoUrl,
             description = null,
             contentTypeText = null,
             yearText = null,
@@ -530,7 +532,9 @@ internal fun buildCollectionFolderItem(
             posterShape = folder.tileShape,
             focusGlowEnabled = collection.focusGlowEnabled,
             focusGifEnabled = folder.focusGifEnabled,
-            focusGifUrl = folder.focusGifUrl
+            focusGifUrl = folder.focusGifUrl,
+            heroBackdropUrl = folder.heroBackdropUrl,
+            titleLogoUrl = folder.titleLogoUrl
         )
     )
 }

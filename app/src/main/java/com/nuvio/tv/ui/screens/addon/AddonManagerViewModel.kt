@@ -548,7 +548,8 @@ class AddonManagerViewModel @Inject constructor(
                         coverEmoji = folder.coverEmoji,
                         tileShape = folder.tileShape.name,
                         hideTitle = folder.hideTitle,
-                        backdropImageUrl = folder.backdropImageUrl,
+                        heroBackdropUrl = folder.heroBackdropUrl,
+                        titleLogoUrl = folder.titleLogoUrl,
                         catalogSources = folder.catalogSources.map { src ->
                             AddonConfigServer.CatalogSourceInfo(
                                 addonId = src.addonId,

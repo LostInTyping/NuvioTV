@@ -1718,7 +1718,7 @@ function updateCollectionTitle(ci, val) {
 }
 
 function addFolder(ci) {
-  collections[ci].folders.push({ id: generateId(), title: 'New Folder', coverImageUrl: null, focusGifUrl: null, focusGifEnabled: true, coverEmoji: null, tileShape: 'SQUARE', hideTitle: false, backdropImageUrl: null, catalogSources: [] });
+  collections[ci].folders.push({ id: generateId(), title: 'New Folder', coverImageUrl: null, focusGifUrl: null, focusGifEnabled: true, coverEmoji: null, tileShape: 'SQUARE', hideTitle: false, heroBackdropUrl: null, titleLogoUrl: null, catalogSources: [] });
   expandedFolder = ci + '-' + (collections[ci].folders.length - 1);
   renderCollections();
 }
@@ -1764,7 +1764,7 @@ function updateFolderFocusGifEnabled(ci, fi, checked) {
 }
 
 function updateFolderBackdropImageUrl(ci, fi, val) {
-  collections[ci].folders[fi].backdropImageUrl = val || null;
+  collections[ci].folders[fi].heroBackdropUrl = val || null;
 }
 
 function updateFolderCoverEmoji(ci, fi, val) {
@@ -2074,7 +2074,7 @@ function renderCollections() {
               '</div>' +
               '<div class="folder-settings-group-label" style="margin-top:0.5rem">' + i18n.folderBackdrop + '</div>' +
               '<div class="folder-setting-item">' +
-                '<input type="url" aria-label="' + escapeAttr(i18n.folderBackdropUrl) + '" placeholder="' + escapeAttr(i18n.folderBackdropPlaceholder) + '" value="' + escapeAttr(folder.backdropImageUrl || '') + '" oninput="updateFolderBackdropImageUrl(' + ci + ',' + fi + ',this.value)">' +
+                '<input type="url" aria-label="' + escapeAttr(i18n.folderBackdropUrl) + '" placeholder="' + escapeAttr(i18n.folderBackdropPlaceholder) + '" value="' + escapeAttr(folder.heroBackdropUrl || '') + '" oninput="updateFolderBackdropImageUrl(' + ci + ',' + fi + ',this.value)">' +
               '</div>' +
             '</div>' +
             '<div class="folder-settings-group">' +
