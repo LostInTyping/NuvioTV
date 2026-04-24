@@ -10,13 +10,13 @@ import com.nuvio.tv.domain.model.CollectionCatalogSource
 import com.nuvio.tv.domain.model.CollectionFolder
 import com.nuvio.tv.domain.model.FolderViewMode
 import com.nuvio.tv.domain.model.PosterShape
+import java.util.UUID
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import java.util.UUID
-import javax.inject.Inject
-import javax.inject.Singleton
 
 data class ValidationResult(
     val valid: Boolean,
@@ -190,8 +190,6 @@ class CollectionsDataStore @Inject constructor(
         val tileShape: String = "SQUARE",
         val hideTitle: Boolean = false,
         val backdropImageUrl: String? = null,
-        val backdropAnimatedUrl: String? = null,
-        val backdropAnimatedEnabled: Boolean? = null,
         val catalogSources: List<SerializableCatalogSource> = emptyList()
     )
 
@@ -222,8 +220,6 @@ class CollectionsDataStore @Inject constructor(
                 tileShape = folder.tileShape.name,
                 hideTitle = folder.hideTitle,
                 backdropImageUrl = folder.backdropImageUrl,
-                backdropAnimatedUrl = folder.backdropAnimatedUrl,
-                backdropAnimatedEnabled = folder.backdropAnimatedEnabled,
                 catalogSources = folder.catalogSources.map { source ->
                     SerializableCatalogSource(
                         addonId = source.addonId,
@@ -255,8 +251,6 @@ class CollectionsDataStore @Inject constructor(
                 tileShape = PosterShape.fromString(folder.tileShape),
                 hideTitle = folder.hideTitle,
                 backdropImageUrl = folder.backdropImageUrl,
-                backdropAnimatedUrl = folder.backdropAnimatedUrl,
-                backdropAnimatedEnabled = folder.backdropAnimatedEnabled ?: true,
                 catalogSources = folder.catalogSources.map { source ->
                     CollectionCatalogSource(
                         addonId = source.addonId,

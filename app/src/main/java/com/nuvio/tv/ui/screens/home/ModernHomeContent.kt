@@ -5,6 +5,7 @@
 
 package com.nuvio.tv.ui.screens.home
 
+import android.view.KeyEvent as AndroidKeyEvent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.AnimationSpec
@@ -12,8 +13,8 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.BringIntoViewSpec
 import androidx.compose.foundation.gestures.LocalBringIntoViewSpec
@@ -28,9 +29,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -52,37 +53,38 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.metrics.performance.PerformanceMetricsState
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.nuvio.tv.R
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.metrics.performance.PerformanceMetricsState
 import androidx.tv.material3.Border
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
@@ -95,24 +97,22 @@ import coil.decode.SvgDecoder
 import coil.imageLoader
 import coil.memory.MemoryCache
 import coil.request.ImageRequest
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
+import com.nuvio.tv.LocalContentFocusRequester
+import com.nuvio.tv.LocalSidebarExpanded
+import com.nuvio.tv.R
 import com.nuvio.tv.domain.model.FocusedPosterTrailerPlaybackTarget
 import com.nuvio.tv.domain.model.MetaPreview
 import com.nuvio.tv.ui.components.ContinueWatchingCard
+import com.nuvio.tv.ui.components.ContinueWatchingOptionsDialog
 import com.nuvio.tv.ui.components.HeroCarousel
 import com.nuvio.tv.ui.components.LoadingIndicator
-import com.nuvio.tv.ui.components.ContinueWatchingOptionsDialog
 import com.nuvio.tv.ui.components.MonochromePosterPlaceholder
 import com.nuvio.tv.ui.components.TrailerPlayer
-import com.nuvio.tv.LocalSidebarExpanded
-import com.nuvio.tv.LocalContentFocusRequester
+import com.nuvio.tv.ui.components.firstNonBlankMediaUrl as firstNonBlank
 import com.nuvio.tv.ui.theme.NuvioColors
-import kotlinx.coroutines.delay
-import android.view.KeyEvent as AndroidKeyEvent
 import kotlin.math.abs
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
-
 
 private const val MODERN_HERO_RAPID_NAV_THRESHOLD_MS = 130L
 private const val MODERN_HERO_RAPID_NAV_SETTLE_MS = 170L
@@ -469,7 +469,10 @@ fun ModernHomeContent(
             heroTransitioningRef.set(false)
             return@LaunchedEffect
         }
-        val row = latestHeroRow ?: run { heroTransitioningRef.set(false); return@LaunchedEffect }
+        val row = latestHeroRow ?: run {
+            heroTransitioningRef.set(false)
+            return@LaunchedEffect
+        }
         val latestKey = row.items.getOrNull(latestHeroIndex)?.key ?: row.items.firstOrNull()?.key
         if (latestKey != targetHeroKey) {
             heroTransitioningRef.set(false)
@@ -760,7 +763,7 @@ fun ModernHomeContent(
                         )
                         val wPx = with(verticalPrefetchDensity) { metrics.width.roundToPx() }
                         val hPx = with(verticalPrefetchDensity) { metrics.height.roundToPx() }
-                        val cacheKey = "${url}_${wPx}x${hPx}"
+                        val cacheKey = "${url}_${wPx}x$hPx"
                         if (verticalPrefetchImageLoader.memoryCache?.get(MemoryCache.Key(cacheKey)) != null) continue
                         verticalPrefetchImageLoader.enqueue(
                             ImageRequest.Builder(verticalPrefetchContext)
@@ -791,8 +794,7 @@ fun ModernHomeContent(
                     .focusRestorer { focusRestorerRequester }
                     .onPreviewKeyEvent { event ->
                         val native = event.nativeKeyEvent
-                       
-                    
+
                         if (native.action == AndroidKeyEvent.ACTION_DOWN &&
                             native.repeatCount > 0 &&
                             (native.keyCode == AndroidKeyEvent.KEYCODE_DPAD_DOWN ||

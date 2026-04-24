@@ -7,16 +7,16 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.nuvio.tv.R
 import com.nuvio.tv.domain.model.CatalogRow
 import com.nuvio.tv.domain.model.Collection
 import com.nuvio.tv.domain.model.CollectionFolder
 import com.nuvio.tv.domain.model.ContentType
-import com.nuvio.tv.domain.model.PosterShape
-import com.nuvio.tv.ui.util.localizeEpisodeTitle
 import com.nuvio.tv.domain.model.MetaPreview
-import com.nuvio.tv.R
-import com.nuvio.tv.ui.components.collectionFolderBackdropUrl
+import com.nuvio.tv.domain.model.PosterShape
+import com.nuvio.tv.ui.components.firstNonBlankMediaUrl as firstNonBlank
 import com.nuvio.tv.ui.components.formatContinueWatchingProgressLabel
+import com.nuvio.tv.ui.util.localizeEpisodeTitle
 
 internal val YEAR_REGEX = Regex("""\b(19|20)\d{2}\b""")
 internal const val MODERN_HERO_TEXT_WIDTH_FRACTION = 0.42f
@@ -190,6 +190,7 @@ class ModernCarouselRowBuildCache {
     var continueWatchingRow: HeroCarouselRow? = null
     internal val catalogRows = mutableMapOf<String, ModernCatalogRowBuildCacheEntry>()
     internal val collectionRows = mutableMapOf<String, ModernCollectionRowBuildCacheEntry>()
+
     // per-item cache: rowKey -> (itemId -> cached carousel item + source MetaPreview)
     internal val catalogItemCache = mutableMapOf<String, MutableMap<String, CachedCarouselItem>>()
 }
@@ -246,7 +247,6 @@ internal fun ModernCarouselItem.catalogCardMetrics(
         )
     }
 }
-
 
 internal fun buildContinueWatchingItem(
     item: ContinueWatchingItem,
@@ -464,7 +464,7 @@ internal fun buildCatalogItem(
     )
 
     return ModernCarouselItem(
-        key = "catalog_${row.key()}_${item.id}_${occurrence}",
+        key = "catalog_${row.key()}_${item.id}_$occurrence",
         title = item.name,
         subtitle = item.releaseInfo,
         imageUrl = if (useLandscapePosters) {
@@ -503,8 +503,7 @@ internal fun buildCollectionFolderItem(
     } else {
         imageUrl
     }
-    val heroBackdrop = collectionFolderBackdropUrl(folder)
-        ?: firstNonBlank(folder.coverImageUrl, collection.backdropImageUrl)
+    val heroBackdrop = firstNonBlank(folder.backdropImageUrl, folder.coverImageUrl, collection.backdropImageUrl)
 
     return ModernCarouselItem(
         key = "collection_${collection.id}_${folder.id}_$occurrence",
@@ -566,15 +565,11 @@ internal fun catalogRowTitle(
 }
 
 internal fun CatalogRow.key(): String {
-    return "${addonId}_${apiType}_${catalogId}"
+    return "${addonId}_${apiType}_$catalogId"
 }
 
 internal fun isSeriesType(type: String?): Boolean {
     return type.equals("series", ignoreCase = true) || type.equals("tv", ignoreCase = true)
-}
-
-internal fun firstNonBlank(vararg candidates: String?): String? {
-    return candidates.firstOrNull { !it.isNullOrBlank() }?.trim()
 }
 
 internal fun extractYear(releaseInfo: String?): String? {
@@ -584,6 +579,7 @@ internal fun extractYear(releaseInfo: String?): String? {
 
 @Volatile
 private var cachedDateFormatLocale: java.util.Locale? = null
+
 @Volatile
 private var cachedDateFormat: java.text.SimpleDateFormat? = null
 

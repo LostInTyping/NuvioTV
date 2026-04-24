@@ -7,22 +7,15 @@ fun collectionFolderCardImageUrl(
     isFocused: Boolean
 ): String? {
     if (!folder.focusGifEnabled) {
-        return firstNonBlank(folder.coverImageUrl)
+        return firstNonBlankMediaUrl(folder.coverImageUrl)
     }
     return if (isFocused) {
-        firstNonBlank(folder.focusGifUrl, folder.coverImageUrl)
+        firstNonBlankMediaUrl(folder.focusGifUrl, folder.coverImageUrl)
     } else {
-        firstNonBlank(folder.coverImageUrl, folder.focusGifUrl)
+        firstNonBlankMediaUrl(folder.coverImageUrl, folder.focusGifUrl)
     }
 }
 
-fun collectionFolderBackdropUrl(folder: CollectionFolder): String? {
-    if (!folder.backdropAnimatedEnabled) {
-        return firstNonBlank(folder.backdropImageUrl)
-    }
-    return firstNonBlank(folder.backdropAnimatedUrl, folder.backdropImageUrl)
-}
-
-private fun firstNonBlank(vararg candidates: String?): String? {
+internal fun firstNonBlankMediaUrl(vararg candidates: String?): String? {
     return candidates.firstOrNull { !it.isNullOrBlank() }?.trim()
 }

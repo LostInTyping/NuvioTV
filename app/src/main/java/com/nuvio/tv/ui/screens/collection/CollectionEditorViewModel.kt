@@ -11,13 +11,13 @@ import com.nuvio.tv.domain.model.FolderViewMode
 import com.nuvio.tv.domain.model.PosterShape
 import com.nuvio.tv.domain.repository.AddonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 data class CollectionEditorUiState(
     val isNew: Boolean = true,
@@ -212,18 +212,6 @@ class CollectionEditorViewModel @Inject constructor(
         }
     }
 
-    fun updateFolderBackdropAnimatedUrl(url: String) {
-        _uiState.update { state ->
-            state.copy(editingFolder = state.editingFolder?.copy(backdropAnimatedUrl = url.ifBlank { null }))
-        }
-    }
-
-    fun updateFolderBackdropAnimatedEnabled(enabled: Boolean) {
-        _uiState.update { state ->
-            state.copy(editingFolder = state.editingFolder?.copy(backdropAnimatedEnabled = enabled))
-        }
-    }
-
     fun updateFolderCoverEmoji(emoji: String) {
         _uiState.update { state ->
             state.copy(editingFolder = state.editingFolder?.copy(
@@ -398,8 +386,7 @@ class CollectionEditorViewModel @Inject constructor(
         val cleanedFolder = rawFolder.copy(
             title = rawFolder.title.ifBlank { "Untitled" },
             coverImageUrl = rawFolder.coverImageUrl?.ifBlank { null },
-            backdropImageUrl = rawFolder.backdropImageUrl?.ifBlank { null },
-            backdropAnimatedUrl = rawFolder.backdropAnimatedUrl?.ifBlank { null }
+            backdropImageUrl = rawFolder.backdropImageUrl?.ifBlank { null }
         )
         val editingFolder = cleanedFolder
         _uiState.update { state ->

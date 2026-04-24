@@ -1042,8 +1042,8 @@ var i18n = {
   focusGif: '${context.getString(R.string.collections_editor_focus_gif).replace("'", "\\'")}',
   playGif: '${context.getString(R.string.collections_editor_play_gif).replace("'", "\\'")}',
   folderBackdrop: '${context.getString(R.string.collections_editor_folder_backdrop).replace("'", "\\'")}',
-  folderBackdropAnimated: '${context.getString(R.string.collections_editor_folder_backdrop_animated).replace("'", "\\'")}',
-  playBackdropAnimated: '${context.getString(R.string.collections_editor_play_backdrop_animated).replace("'", "\\'")}',
+  folderBackdropUrl: '${context.getString(R.string.collections_editor_folder_backdrop_url).replace("'", "\\'")}',
+  folderBackdropPlaceholder: '${context.getString(R.string.collections_editor_placeholder_folder_backdrop).replace("'", "\\'")}',
   tileShape: '${context.getString(R.string.collections_editor_tile_shape).replace("'", "\\'")}',
   hideTitle: '${context.getString(R.string.collections_editor_hide_title).replace("'", "\\'")}',
   catalogs: '${context.getString(R.string.collections_editor_catalogs).replace("'", "\\'")}',
@@ -1718,7 +1718,7 @@ function updateCollectionTitle(ci, val) {
 }
 
 function addFolder(ci) {
-  collections[ci].folders.push({ id: generateId(), title: 'New Folder', coverImageUrl: null, focusGifUrl: null, focusGifEnabled: true, coverEmoji: null, tileShape: 'SQUARE', hideTitle: false, backdropImageUrl: null, backdropAnimatedUrl: null, backdropAnimatedEnabled: true, catalogSources: [] });
+  collections[ci].folders.push({ id: generateId(), title: 'New Folder', coverImageUrl: null, focusGifUrl: null, focusGifEnabled: true, coverEmoji: null, tileShape: 'SQUARE', hideTitle: false, backdropImageUrl: null, catalogSources: [] });
   expandedFolder = ci + '-' + (collections[ci].folders.length - 1);
   renderCollections();
 }
@@ -1765,14 +1765,6 @@ function updateFolderFocusGifEnabled(ci, fi, checked) {
 
 function updateFolderBackdropImageUrl(ci, fi, val) {
   collections[ci].folders[fi].backdropImageUrl = val || null;
-}
-
-function updateFolderBackdropAnimatedUrl(ci, fi, val) {
-  collections[ci].folders[fi].backdropAnimatedUrl = val || null;
-}
-
-function updateFolderBackdropAnimatedEnabled(ci, fi, checked) {
-  collections[ci].folders[fi].backdropAnimatedEnabled = checked;
 }
 
 function updateFolderCoverEmoji(ci, fi, val) {
@@ -2080,19 +2072,9 @@ function renderCollections() {
                   '<span class="toggle-thumb"></span>' +
                 '</label>' +
               '</div>' +
+              '<div class="folder-settings-group-label" style="margin-top:0.5rem">' + i18n.folderBackdrop + '</div>' +
               '<div class="folder-setting-item">' +
-                '<input type="url" placeholder="Backdrop image URL (optional)" value="' + escapeAttr(folder.backdropImageUrl || '') + '" oninput="updateFolderBackdropImageUrl(' + ci + ',' + fi + ',this.value)">' +
-              '</div>' +
-              '<div class="folder-setting-item">' +
-                '<input type="url" placeholder="Animated backdrop URL (optional)" value="' + escapeAttr(folder.backdropAnimatedUrl || '') + '" oninput="updateFolderBackdropAnimatedUrl(' + ci + ',' + fi + ',this.value)">' +
-              '</div>' +
-              '<div class="folder-setting-item">' +
-                '<span class="toggle-label">' + i18n.playBackdropAnimated + '</span>' +
-                '<label class="toggle-switch">' +
-                  '<input type="checkbox"' + (folder.backdropAnimatedEnabled !== false ? ' checked' : '') + ' onchange="updateFolderBackdropAnimatedEnabled(' + ci + ',' + fi + ',this.checked)">' +
-                  '<span class="toggle-track"></span>' +
-                  '<span class="toggle-thumb"></span>' +
-                '</label>' +
+                '<input type="url" aria-label="' + escapeAttr(i18n.folderBackdropUrl) + '" placeholder="' + escapeAttr(i18n.folderBackdropPlaceholder) + '" value="' + escapeAttr(folder.backdropImageUrl || '') + '" oninput="updateFolderBackdropImageUrl(' + ci + ',' + fi + ',this.value)">' +
               '</div>' +
             '</div>' +
             '<div class="folder-settings-group">' +

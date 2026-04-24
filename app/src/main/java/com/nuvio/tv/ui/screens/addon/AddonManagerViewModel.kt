@@ -4,24 +4,25 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nuvio.tv.R
-import com.nuvio.tv.core.sync.HomeCatalogSettingsSyncService
-import com.nuvio.tv.core.sync.homeCatalogKey
-import com.nuvio.tv.core.sync.homeLegacyDisabledCatalogKey
 import com.nuvio.tv.core.network.NetworkResult
+import com.nuvio.tv.core.profile.ProfileManager
 import com.nuvio.tv.core.qr.QrCodeGenerator
 import com.nuvio.tv.core.server.AddonConfigServer
 import com.nuvio.tv.core.server.DeviceIpAddress
-import com.nuvio.tv.core.profile.ProfileManager
+import com.nuvio.tv.core.sync.HomeCatalogSettingsSyncService
+import com.nuvio.tv.core.sync.homeCatalogKey
+import com.nuvio.tv.core.sync.homeLegacyDisabledCatalogKey
 import com.nuvio.tv.data.local.CollectionsDataStore
 import com.nuvio.tv.data.local.LayoutPreferenceDataStore
 import com.nuvio.tv.domain.model.Addon
-import com.nuvio.tv.domain.model.Collection
-import com.nuvio.tv.domain.model.CollectionFolder
-import com.nuvio.tv.domain.model.CollectionCatalogSource
 import com.nuvio.tv.domain.model.CatalogDescriptor
+import com.nuvio.tv.domain.model.Collection
+import com.nuvio.tv.domain.model.CollectionCatalogSource
+import com.nuvio.tv.domain.model.CollectionFolder
 import com.nuvio.tv.domain.repository.AddonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +33,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-import javax.inject.Inject
 
 @HiltViewModel
 class AddonManagerViewModel @Inject constructor(
@@ -378,7 +378,11 @@ class AddonManagerViewModel @Inject constructor(
         val proposedCollectionsJson = change.proposedCollectionsJson
         val collectionsChanged = proposedCollectionsJson != null
         val proposedCollectionCount = if (proposedCollectionsJson != null) {
-            try { parseCollectionsFromJson(proposedCollectionsJson).size } catch (_: Exception) { 0 }
+            try {
+                parseCollectionsFromJson(proposedCollectionsJson).size
+            } catch (_: Exception) {
+                0
+            }
         } else 0
         val proposedDisabledCollectionKeys = change.proposedDisabledCollectionKeys
 
@@ -545,8 +549,6 @@ class AddonManagerViewModel @Inject constructor(
                         tileShape = folder.tileShape.name,
                         hideTitle = folder.hideTitle,
                         backdropImageUrl = folder.backdropImageUrl,
-                        backdropAnimatedUrl = folder.backdropAnimatedUrl,
-                        backdropAnimatedEnabled = folder.backdropAnimatedEnabled,
                         catalogSources = folder.catalogSources.map { src ->
                             AddonConfigServer.CatalogSourceInfo(
                                 addonId = src.addonId,

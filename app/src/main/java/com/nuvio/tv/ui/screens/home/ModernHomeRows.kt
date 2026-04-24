@@ -9,7 +9,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.gestures.BringIntoViewSpec
 import androidx.compose.foundation.gestures.LocalBringIntoViewSpec
 import androidx.compose.foundation.layout.Arrangement
@@ -18,16 +18,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListPrefetchStrategy
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -41,16 +43,16 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.foundation.focusGroup
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -59,26 +61,25 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.tv.material3.Border
-import androidx.tv.material3.Icon
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
 import coil.imageLoader
 import coil.memory.MemoryCache
 import coil.request.ImageRequest
+import com.nuvio.tv.LocalSidebarExpanded
 import com.nuvio.tv.R
 import com.nuvio.tv.domain.model.FocusedPosterTrailerPlaybackTarget
 import com.nuvio.tv.domain.model.MetaPreview
@@ -86,7 +87,6 @@ import com.nuvio.tv.ui.components.ContinueWatchingCard
 import com.nuvio.tv.ui.components.MonochromePosterPlaceholder
 import com.nuvio.tv.ui.components.TrailerPlayer
 import com.nuvio.tv.ui.components.rememberArtworkBackedCardGlow
-import com.nuvio.tv.LocalSidebarExpanded
 import com.nuvio.tv.ui.theme.NuvioColors
 import kotlin.math.abs
 import kotlinx.coroutines.delay
@@ -96,6 +96,28 @@ private const val MODERN_HORIZONTAL_FOCUS_DEBOUNCE_MS = 140L
 private const val POSTER_PREFETCH_DISTANCE = 8
 
 internal val LocalVerticalRowsScrolling = androidx.compose.runtime.compositionLocalOf { false }
+
+internal fun resolveModernCarouselCardBaseImageUrl(
+    item: ModernCarouselItem,
+    focusedPosterBackdropExpandEnabled: Boolean,
+    isBackdropExpanded: Boolean,
+    useLandscapeOverlayTreatment: Boolean,
+    effectiveBackdropUrl: String?
+): String? {
+    return when {
+        item.payload is ModernPayload.CollectionFolder ->
+            item.imageUrl ?: item.heroPreview.poster
+
+        focusedPosterBackdropExpandEnabled && isBackdropExpanded ->
+            item.heroPreview.backdrop ?: item.imageUrl ?: item.heroPreview.poster
+
+        useLandscapeOverlayTreatment ->
+            effectiveBackdropUrl ?: item.heroPreview.poster
+
+        else ->
+            item.imageUrl ?: item.heroPreview.poster ?: item.heroPreview.backdrop
+    }
+}
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -486,7 +508,7 @@ internal fun ModernRowSection(
                         )
                         val widthPx = with(density) { metrics.width.roundToPx() }
                         val heightPx = with(density) { metrics.height.roundToPx() }
-                        url to "${url}_${widthPx}x${heightPx}"
+                        url to "${url}_${widthPx}x$heightPx"
                     }
                     is ModernPayload.CollectionFolder -> {
                         val metrics = item.catalogCardMetrics(
@@ -498,9 +520,9 @@ internal fun ModernRowSection(
                         )
                         val widthPx = with(density) { metrics.width.roundToPx() }
                         val heightPx = with(density) { metrics.height.roundToPx() }
-                        url to "${url}_${widthPx}x${heightPx}"
+                        url to "${url}_${widthPx}x$heightPx"
                     }
-                    is ModernPayload.ContinueWatching -> url to "${url}_${cwWidthPx}x${cwHeightPx}"
+                    is ModernPayload.ContinueWatching -> url to "${url}_${cwWidthPx}x$cwHeightPx"
                 }
             }
             fun enqueueIfNeeded(item: ModernCarouselItem, widthPx: Int, heightPx: Int) {
@@ -716,7 +738,6 @@ internal fun ModernRowSection(
     }
 }
 
-
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 private fun ModernCarouselCard(
@@ -779,13 +800,13 @@ private fun ModernCarouselCard(
     val effectiveBackdropUrl = frozenBackdropUrl.value
     var isFocused by remember { mutableStateOf(false) }
     val payload = item.payload as? ModernPayload.CollectionFolder
-    val baseImageUrl = if (focusedPosterBackdropExpandEnabled && isBackdropExpanded) {
-        item.heroPreview.backdrop ?: item.imageUrl ?: item.heroPreview.poster
-    } else if (useLandscapeOverlayTreatment) {
-        effectiveBackdropUrl ?: item.heroPreview.poster
-    } else {
-        item.imageUrl ?: item.heroPreview.poster ?: item.heroPreview.backdrop
-    }
+    val baseImageUrl = resolveModernCarouselCardBaseImageUrl(
+        item = item,
+        focusedPosterBackdropExpandEnabled = focusedPosterBackdropExpandEnabled,
+        isBackdropExpanded = isBackdropExpanded,
+        useLandscapeOverlayTreatment = useLandscapeOverlayTreatment,
+        effectiveBackdropUrl = effectiveBackdropUrl
+    )
     val imageUrl = when {
         payload == null -> baseImageUrl
         !payload.focusGifEnabled -> baseImageUrl
@@ -814,7 +835,7 @@ private fun ModernCarouselCard(
             ImageRequest.Builder(context)
                 .data(it)
                 .crossfade(false)
-                .memoryCacheKey("${it}_${requestWidthPx}x${requestHeightPx}")
+                .memoryCacheKey("${it}_${requestWidthPx}x$requestHeightPx")
                 .size(width = requestWidthPx, height = requestHeightPx)
                 .build()
         }
@@ -832,7 +853,7 @@ private fun ModernCarouselCard(
             ImageRequest.Builder(context)
                 .data(it)
                 .crossfade(true)
-                .memoryCacheKey("${it}_${maxLogoWidthPx}x${logoHeightPx}")
+                .memoryCacheKey("${it}_${maxLogoWidthPx}x$logoHeightPx")
                 .size(width = maxLogoWidthPx, height = logoHeightPx)
                 .build()
         }
@@ -1060,7 +1081,6 @@ private fun ModernCarouselCard(
         }
     }
 }
-
 
 private fun shouldResetBackdropTimer(key: Key): Boolean {
     return when (key) {

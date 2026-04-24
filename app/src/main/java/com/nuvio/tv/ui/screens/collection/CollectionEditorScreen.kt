@@ -39,14 +39,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -68,14 +69,13 @@ import androidx.tv.material3.Switch
 import androidx.tv.material3.SwitchDefaults
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
+import com.nuvio.tv.R
 import com.nuvio.tv.domain.model.CollectionCatalogSource
 import com.nuvio.tv.domain.model.CollectionFolder
 import com.nuvio.tv.domain.model.FolderViewMode
 import com.nuvio.tv.domain.model.PosterShape
 import com.nuvio.tv.ui.components.LoadingIndicator
 import com.nuvio.tv.ui.theme.NuvioColors
-import com.nuvio.tv.R
-import androidx.compose.ui.res.stringResource
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -94,7 +94,9 @@ private fun NuvioTextField(
     LaunchedEffect(isEditing) {
         if (isEditing) {
             repeat(3) { androidx.compose.runtime.withFrameNanos { } }
-            try { textFieldFocusRequester.requestFocus() } catch (_: Exception) {}
+            try {
+                textFieldFocusRequester.requestFocus()
+            } catch (_: Exception) {}
         }
     }
 
@@ -642,7 +644,9 @@ private fun FolderEditorContent(
 
     LaunchedEffect(Unit) {
         repeat(5) { androidx.compose.runtime.withFrameNanos { } }
-        try { titleFocusRequester.requestFocus() } catch (_: Exception) {}
+        try {
+            titleFocusRequester.requestFocus()
+        } catch (_: Exception) {}
     }
 
     Column(
@@ -683,7 +687,9 @@ private fun FolderEditorContent(
                     val targetSource = folder.catalogSources[targetIndex]
                     val targetKey = "${targetSource.addonId}_${targetSource.type}_${targetSource.catalogId}"
                     repeat(3) { androidx.compose.runtime.withFrameNanos { } }
-                    try { catalogFocusRequesters[targetKey]?.requestFocus() } catch (_: Exception) {}
+                    try {
+                        catalogFocusRequesters[targetKey]?.requestFocus()
+                    } catch (_: Exception) {}
                 }
                 pendingFocusIndex = -1
             }
@@ -879,50 +885,6 @@ private fun FolderEditorContent(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = stringResource(R.string.collections_editor_placeholder_folder_backdrop)
                 )
-
-                Spacer(modifier = Modifier.height(12.dp))
-                NuvioTextField(
-                    value = folder.backdropAnimatedUrl.orEmpty(),
-                    onValueChange = { viewModel.updateFolderBackdropAnimatedUrl(it) },
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = stringResource(R.string.collections_editor_placeholder_folder_backdrop_animated)
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-                Card(
-                    onClick = { viewModel.updateFolderBackdropAnimatedEnabled(!folder.backdropAnimatedEnabled) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.colors(
-                        containerColor = NuvioColors.BackgroundCard,
-                        focusedContainerColor = NuvioColors.FocusBackground
-                    ),
-                    border = CardDefaults.border(
-                        focusedBorder = Border(
-                            border = BorderStroke(2.dp, NuvioColors.FocusRing),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                    ),
-                    scale = CardDefaults.scale(focusedScale = 1f),
-                    shape = CardDefaults.shape(RoundedCornerShape(12.dp))
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            stringResource(R.string.collections_editor_play_backdrop_animated),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = NuvioColors.TextPrimary
-                        )
-                        Switch(
-                            checked = folder.backdropAnimatedEnabled,
-                            onCheckedChange = { viewModel.updateFolderBackdropAnimatedEnabled(it) }
-                        )
-                    }
-                }
             }
 
             item {
@@ -1318,7 +1280,9 @@ private fun GenrePickerContent(
 
     LaunchedEffect(title, selectedGenre, genreOptions) {
         repeat(5) { androidx.compose.runtime.withFrameNanos { } }
-        try { firstOptionFocusRequester.requestFocus() } catch (_: Exception) {}
+        try {
+            firstOptionFocusRequester.requestFocus()
+        } catch (_: Exception) {}
     }
 
     Column(
@@ -1478,7 +1442,9 @@ private fun EmojiPickerContent(
 
     LaunchedEffect(Unit) {
         repeat(5) { androidx.compose.runtime.withFrameNanos { } }
-        try { firstEmojiFocusRequester.requestFocus() } catch (_: Exception) {}
+        try {
+            firstEmojiFocusRequester.requestFocus()
+        } catch (_: Exception) {}
     }
 
     Column(
