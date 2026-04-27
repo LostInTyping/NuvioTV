@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nuvio.tv.data.local.CollectionsDataStore
+import com.nuvio.tv.data.local.LayoutPreferenceDataStore
 import com.nuvio.tv.domain.model.Collection
 import com.nuvio.tv.domain.model.CollectionCatalogSource
 import com.nuvio.tv.domain.model.CollectionFolder
@@ -32,10 +33,12 @@ data class CollectionEditorUiState(
     val isLoading: Boolean = true,
     val availableCatalogs: List<AvailableCatalog> = emptyList(),
     val editingFolder: CollectionFolder? = null,
+    val originalEditingFolder: CollectionFolder? = null,
     val showFolderEditor: Boolean = false,
     val showCatalogPicker: Boolean = false,
     val genrePickerSourceIndex: Int? = null,
-    val showEmojiPicker: Boolean = false
+    val showEmojiPicker: Boolean = false,
+    val modernHeroFullScreenBackdropEnabled: Boolean = false
 )
 
 data class AvailableCatalog(
@@ -52,7 +55,8 @@ data class AvailableCatalog(
 class CollectionEditorViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val collectionsDataStore: CollectionsDataStore,
-    private val addonRepository: AddonRepository
+    private val addonRepository: AddonRepository,
+    private val layoutPreferenceDataStore: LayoutPreferenceDataStore
 ) : ViewModel() {
 
     private val collectionIdArg: String = savedStateHandle["collectionId"] ?: ""
@@ -66,6 +70,8 @@ class CollectionEditorViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
+            val fullScreenBackdrop = layoutPreferenceDataStore.modernHeroFullScreenBackdropEnabled.first()
+            _uiState.update { it.copy(modernHeroFullScreenBackdropEnabled = fullScreenBackdrop) }
             val addons = addonRepository.getInstalledAddons().first()
             val availableCatalogs = addons.flatMap { addon ->
                 addon.catalogs
@@ -143,13 +149,23 @@ class CollectionEditorViewModel @Inject constructor(
             tileShape = PosterShape.POSTER
         )
         _uiState.update {
-            it.copy(editingFolder = newFolder, showFolderEditor = true)
+            it.copy(
+                editingFolder = newFolder,
+                originalEditingFolder = newFolder,
+                showFolderEditor = true
+            )
         }
     }
 
     fun editFolder(folderId: String) {
         val folder = _uiState.value.folders.find { it.id == folderId } ?: return
-        _uiState.update { it.copy(editingFolder = folder, showFolderEditor = true) }
+        _uiState.update {
+            it.copy(
+                editingFolder = folder,
+                originalEditingFolder = folder,
+                showFolderEditor = true
+            )
+        }
     }
 
     fun removeFolder(folderId: String) {
@@ -407,6 +423,7 @@ class CollectionEditorViewModel @Inject constructor(
                 folders = newFolders,
                 showFolderEditor = false,
                 editingFolder = null,
+                originalEditingFolder = null,
                 showCatalogPicker = false,
                 genrePickerSourceIndex = null,
                 showEmojiPicker = false
@@ -419,6 +436,7 @@ class CollectionEditorViewModel @Inject constructor(
             it.copy(
                 showFolderEditor = false,
                 editingFolder = null,
+                originalEditingFolder = null,
                 showCatalogPicker = false,
                 genrePickerSourceIndex = null,
                 showEmojiPicker = false
