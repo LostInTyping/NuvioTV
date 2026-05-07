@@ -377,6 +377,22 @@ class LayoutPreferenceDataStore @Inject constructor(
         }
     }
 
+    suspend fun updateDisabledHomeCatalogKeys(transform: (List<String>) -> List<String>): Boolean {
+        var changed = false
+        store().edit { prefs ->
+            val current = parseCatalogKeys(prefs[disabledHomeCatalogKeysKey])
+            val updated = normalizeCatalogOrderKeys(transform(current))
+            if (updated == current) return@edit
+            changed = true
+            if (updated.isEmpty()) {
+                prefs.remove(disabledHomeCatalogKeysKey)
+            } else {
+                prefs[disabledHomeCatalogKeysKey] = gson.toJson(updated)
+            }
+        }
+        return changed
+    }
+
     suspend fun setSidebarCollapsedByDefault(collapsed: Boolean) {
         store().edit { prefs ->
             val modernSidebarEnabled =
