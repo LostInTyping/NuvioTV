@@ -1033,6 +1033,37 @@
     <string name="catalog_order_disabled_on_home">Disabled on Home</string>
     <string name="catalog_order_enable">Enable</string>
     <string name="catalog_order_disable">Disable</string>
+    <string name="catalog_order_bulk_actions">Bulk Actions</string>
+    <string name="catalog_order_bulk_title">Bulk catalog actions</string>
+    <string name="catalog_order_bulk_subtitle">Choose addons, then enable or disable all of their catalogs at once.</string>
+    <string name="catalog_order_bulk_select_all">Select all</string>
+    <string name="catalog_order_bulk_deselect_all">Deselect all</string>
+    <plurals name="catalog_order_bulk_addons_counter">
+        <item quantity="one">%1$d/%2$d addon selected</item>
+        <item quantity="other">%1$d/%2$d addons selected</item>
+    </plurals>
+    <string name="catalog_order_bulk_enabled_count">%1$d of %2$d enabled</string>
+    <string name="catalog_order_bulk_selected_count">%1$d selected</string>
+    <plurals name="catalog_order_bulk_confirm_enable_title">
+        <item quantity="one">Enable catalogs from %1$d addon?</item>
+        <item quantity="other">Enable catalogs from %1$d addons?</item>
+    </plurals>
+    <plurals name="catalog_order_bulk_confirm_disable_title">
+        <item quantity="one">Disable catalogs from %1$d addon?</item>
+        <item quantity="other">Disable catalogs from %1$d addons?</item>
+    </plurals>
+    <plurals name="catalog_order_bulk_confirm_enable_body">
+        <item quantity="one">This will show %1$d catalog on your Home rows. You can disable it again any time from this screen.</item>
+        <item quantity="other">This will show %1$d catalogs on your Home rows. You can disable them again any time from this screen.</item>
+    </plurals>
+    <plurals name="catalog_order_bulk_confirm_disable_body">
+        <item quantity="one">This will hide %1$d catalog from your Home rows. You can enable it again any time from this screen.</item>
+        <item quantity="other">This will hide %1$d catalogs from your Home rows. You can enable them again any time from this screen.</item>
+    </plurals>
+    <plurals name="catalog_order_bulk_confirm_addon_row">
+        <item quantity="one">%1$s - %2$d catalog</item>
+        <item quantity="other">%1$s - %2$d catalogs</item>
+    </plurals>
 
 
     <!-- StreamScreen -->
