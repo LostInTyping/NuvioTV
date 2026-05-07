@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -34,12 +35,16 @@ fun NuvioDialog(
     title: String,
     subtitle: String? = null,
     width: Dp = 520.dp,
+    contentSpacing: Dp = 16.dp,
     suppressFirstKeyUp: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) {
     var suppressNextKeyUp by remember { mutableStateOf(suppressFirstKeyUp) }
 
-    Dialog(onDismissRequest = onDismiss) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
         Box(
             modifier = Modifier
                 .width(width)
@@ -58,7 +63,7 @@ fun NuvioDialog(
                     false
                 }
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(contentSpacing)) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleLarge,
