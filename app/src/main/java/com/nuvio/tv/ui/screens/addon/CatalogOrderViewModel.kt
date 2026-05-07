@@ -31,7 +31,6 @@ class CatalogOrderViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(CatalogOrderUiState())
     val uiState: StateFlow<CatalogOrderUiState> = _uiState.asStateFlow()
-    private var disabledKeysCache: Set<String> = emptySet()
 
     init {
         observeCatalogs()
@@ -59,13 +58,18 @@ class CatalogOrderViewModel @Inject constructor(
         }
     }
 
-    fun toggleCatalogEnabled(disableKey: String) {
-        val updatedDisabled = disabledKeysCache.toMutableSet().apply {
-            if (disableKey in this) remove(disableKey) else add(disableKey)
-        }
+    fun toggleCatalogEnabled(item: CatalogOrderItem) {
         viewModelScope.launch {
-            layoutPreferenceDataStore.setDisabledHomeCatalogKeys(updatedDisabled.toList())
-            homeCatalogSettingsSyncService.triggerPush()
+            val changed = layoutPreferenceDataStore.updateDisabledHomeCatalogKeys { current ->
+                val isCurrentlyDisabled = item.disableKey in current ||
+                    (item.legacyDisableKey != null && item.legacyDisableKey in current)
+                if (isCurrentlyDisabled) {
+                    current.filterNot { it == item.disableKey || it == item.legacyDisableKey }
+                } else {
+                    (current + item.disableKey).distinct()
+                }
+            }
+            if (changed) homeCatalogSettingsSyncService.triggerPush()
         }
     }
 
@@ -187,7 +191,6 @@ class CatalogOrderViewModel @Inject constructor(
                 )
                 Pair(items, followAddons)
             }.collectLatest { (orderedItems, followAddons) ->
-                disabledKeysCache = orderedItems.filter { it.isDisabled }.map { it.disableKey }.toSet()
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -313,6 +316,7 @@ class CatalogOrderViewModel @Inject constructor(
             CatalogOrderItem(
                 key = entry.key,
                 disableKey = entry.disableKey,
+                legacyDisableKey = entry.legacyDisableKey,
                 catalogName = displayName,
                 addonName = entry.addonName,
                 typeLabel = entry.typeLabel,
@@ -450,6 +454,7 @@ data class CatalogOrderUiState(
 data class CatalogOrderItem(
     val key: String,
     val disableKey: String,
+    val legacyDisableKey: String? = null,
     val catalogName: String,
     val addonName: String,
     val typeLabel: String,
