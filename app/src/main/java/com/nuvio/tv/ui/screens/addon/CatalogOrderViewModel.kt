@@ -73,6 +73,21 @@ class CatalogOrderViewModel @Inject constructor(
         }
     }
 
+    internal fun applyBulkAction(action: BulkAction, selectedAddonNames: Set<String>) {
+        if (selectedAddonNames.isEmpty()) return
+        val items = _uiState.value.items
+        if (items.isEmpty()) return
+        viewModelScope.launch {
+            val changed = layoutPreferenceDataStore.updateDisabledHomeCatalogKeys { current ->
+                when (action) {
+                    BulkAction.ENABLE -> computeEnableForAddons(current, items, selectedAddonNames)
+                    BulkAction.DISABLE -> computeDisableForAddons(current, items, selectedAddonNames)
+                }
+            }
+            if (changed) homeCatalogSettingsSyncService.triggerPush()
+        }
+    }
+
     private fun moveCatalog(key: String, direction: Int) {
         val currentKeys = _uiState.value.items.map { it.key }
         val currentIndex = currentKeys.indexOf(key)
