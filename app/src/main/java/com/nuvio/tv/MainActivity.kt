@@ -572,6 +572,13 @@ class MainActivity : ComponentActivity() {
                         buildList {
                             add(
                                 DrawerItem(
+                                    route = Screen.Search.route,
+                                    label = strNavSearch,
+                                    iconRes = R.raw.sidebar_search
+                                )
+                            )
+                            add(
+                                DrawerItem(
                                     route = Screen.Home.route,
                                     label = strNavHome,
                                     icon = Icons.Default.Home
@@ -586,13 +593,6 @@ class MainActivity : ComponentActivity() {
                                     )
                                 )
                             }
-                            add(
-                                DrawerItem(
-                                    route = Screen.Search.route,
-                                    label = strNavSearch,
-                                    iconRes = R.raw.sidebar_search
-                                )
-                            )
                             add(
                                 DrawerItem(
                                     route = Screen.Library.route,
@@ -619,7 +619,8 @@ class MainActivity : ComponentActivity() {
                     val selectedDrawerRoute = drawerItems.firstOrNull { item ->
                         currentRoute == item.route || currentRoute?.startsWith("${item.route}/") == true
                     }?.route
-                    val selectedDrawerItem = drawerItems.firstOrNull { it.route == selectedDrawerRoute } ?: drawerItems.first()
+                    val selectedDrawerItem = drawerItems.firstOrNull { it.route == selectedDrawerRoute }
+                        ?: drawerItems.first { it.route == Screen.Home.route }
 
                     if (modernSidebarEnabled) {
                         ModernSidebarScaffold(
@@ -733,7 +734,7 @@ private fun SidebarFocusRecoveryEffect(
         if (selectedDrawerRoute != null && drawerItems.any { it.route == selectedDrawerRoute }) {
             return@LaunchedEffect
         }
-        val fallbackRoute = drawerItems.firstOrNull()?.route ?: return@LaunchedEffect
+        val fallbackRoute = Screen.Home.route
         val requester = drawerItemFocusRequesters[fallbackRoute] ?: return@LaunchedEffect
         repeat(2) { withFrameNanos { } }
         runCatching { requester.requestFocus() }
@@ -814,10 +815,7 @@ private fun LegacySidebarScaffold(
         if (!showSidebar || !pendingSidebarFocusRequest || drawerState.currentValue != DrawerValue.Open) {
             return@LaunchedEffect
         }
-        val targetRoute = selectedDrawerRoute ?: drawerItems.firstOrNull()?.route ?: run {
-            pendingSidebarFocusRequest = false
-            return@LaunchedEffect
-        }
+        val targetRoute = selectedDrawerRoute ?: Screen.Home.route
         val requester = drawerItemFocusRequesters[targetRoute] ?: run {
             pendingSidebarFocusRequest = false
             return@LaunchedEffect
@@ -1339,10 +1337,7 @@ private fun ModernSidebarScaffold(
         if (!showSidebar || !pendingSidebarFocusRequest || !isSidebarExpanded) {
             return@LaunchedEffect
         }
-        val targetRoute = selectedDrawerRoute ?: drawerItems.firstOrNull()?.route ?: run {
-            pendingSidebarFocusRequest = false
-            return@LaunchedEffect
-        }
+        val targetRoute = selectedDrawerRoute ?: Screen.Home.route
         val requester = drawerItemFocusRequesters[targetRoute] ?: run {
             pendingSidebarFocusRequest = false
             return@LaunchedEffect
