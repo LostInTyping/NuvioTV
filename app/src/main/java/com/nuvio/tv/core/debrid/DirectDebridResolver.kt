@@ -7,11 +7,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -39,51 +41,49 @@ class DirectDebridResolver @Inject constructor(
             return it
         }
 
-        var ownsResolve = false
-        val newResolve = scope.async(start = CoroutineStart.LAZY) {
-            resolveUncached(stream, season, episode)
-        }
-        val activeResolve = mutex.withLock {
+        val deferred: Deferred<DirectDebridResolveResult> = mutex.withLock {
             getCachedResultLocked(cacheKey)?.let { cached ->
-                return@withLock null to cached
+                return cached
             }
-            val existing = inFlightResolves[cacheKey]
-            if (existing != null) {
-                existing to null
-            } else {
-                inFlightResolves[cacheKey] = newResolve
-                ownsResolve = true
-                newResolve to null
-            }
+            inFlightResolves[cacheKey] ?: installAndStartResolveLocked(stream, season, episode, cacheKey)
         }
-        activeResolve.second?.let {
-            newResolve.cancel()
-            return it
-        }
-        val deferred = activeResolve.first ?: return DirectDebridResolveResult.Error
-        if (!ownsResolve) newResolve.cancel()
-        if (ownsResolve) deferred.start()
+        return deferred.await()
+    }
 
-        return try {
-            val result = deferred.await()
-            if (ownsResolve && result is DirectDebridResolveResult.Success) {
-                mutex.withLock {
-                    resolvedCache[cacheKey] = CachedDirectDebridResolve(
-                        result = result,
-                        cachedAtMs = System.currentTimeMillis()
-                    )
+    private fun installAndStartResolveLocked(
+        stream: Stream,
+        season: Int?,
+        episode: Int?,
+        cacheKey: String
+    ): Deferred<DirectDebridResolveResult> {
+        lateinit var newDeferred: Deferred<DirectDebridResolveResult>
+        newDeferred = scope.async(start = CoroutineStart.LAZY) {
+            var capturedSuccess: DirectDebridResolveResult.Success? = null
+            try {
+                val result = resolveUncached(stream, season, episode)
+                if (result is DirectDebridResolveResult.Success) {
+                    capturedSuccess = result
                 }
-            }
-            result
-        } finally {
-            if (ownsResolve) {
-                mutex.withLock {
-                    if (inFlightResolves[cacheKey] === deferred) {
-                        inFlightResolves.remove(cacheKey)
+                result
+            } finally {
+                withContext(NonCancellable) {
+                    mutex.withLock {
+                        capturedSuccess?.let { success ->
+                            resolvedCache[cacheKey] = CachedDirectDebridResolve(
+                                result = success,
+                                cachedAtMs = System.currentTimeMillis()
+                            )
+                        }
+                        if (inFlightResolves[cacheKey] === newDeferred) {
+                            inFlightResolves.remove(cacheKey)
+                        }
                     }
                 }
             }
         }
+        inFlightResolves[cacheKey] = newDeferred
+        newDeferred.start()
+        return newDeferred
     }
 
     suspend fun cachedPlayableStream(stream: Stream, season: Int?, episode: Int?): Stream? {
