@@ -9,6 +9,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -16,12 +17,14 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.concurrent.atomic.AtomicInteger
 
 class DirectDebridResolverCancellationTest {
 
     @Test
-    fun cachedResultIsAvailable_whenOwnerCallerCancelsMidAwait() = runBlocking {
+    fun cachedResultIsAvailable_whenOwnerCallerIsCancelled() = runBlocking {
         val providerEntered = CompletableDeferred<Unit>()
         val releaseProvider = CompletableDeferred<Unit>()
 
@@ -42,7 +45,11 @@ class DirectDebridResolverCancellationTest {
             DebridSettings(enabled = true, torboxApiKey = "tb_token")
         )
 
-        val resolver = DirectDebridResolver(dataStore, torbox, realDebrid)
+        val resolver = DirectDebridResolver(
+            dataStore = dataStore,
+            torboxResolver = torbox,
+            realDebridResolver = realDebrid
+        )
         val stream = testStream()
 
         val owner = launch(Dispatchers.Default) {
@@ -64,6 +71,59 @@ class DirectDebridResolverCancellationTest {
 
         assertNotNull(cached)
         assertEquals(RESOLVED_URL, cached.url)
+    }
+
+    @Test
+    fun twoConcurrentCallers_shareOneUpstreamResolve_whenCacheKeysMatch() = runBlocking {
+        val providerCallCount = AtomicInteger(0)
+        val providerEntered = CompletableDeferred<Unit>()
+        val releaseProvider = CompletableDeferred<Unit>()
+
+        val torbox = mockk<TorboxDirectDebridResolver>()
+        coEvery { torbox.resolve(any(), any(), any()) } coAnswers {
+            providerCallCount.incrementAndGet()
+            providerEntered.complete(Unit)
+            releaseProvider.await()
+            DirectDebridResolveResult.Success(
+                url = RESOLVED_URL,
+                filename = "right.mkv",
+                videoSize = 1234L
+            )
+        }
+
+        val realDebrid = mockk<RealDebridDirectDebridResolver>()
+        val dataStore = mockk<DebridSettingsDataStore>()
+        every { dataStore.settings } returns flowOf(
+            DebridSettings(enabled = true, torboxApiKey = "tb_token")
+        )
+
+        val resolver = DirectDebridResolver(
+            dataStore = dataStore,
+            torboxResolver = torbox,
+            realDebridResolver = realDebrid
+        )
+        val stream = testStream()
+
+        val first = async(Dispatchers.Default) {
+            resolver.resolveToPlayableStream(stream, season = null, episode = null)
+        }
+        providerEntered.await()
+        val second = async(Dispatchers.Default) {
+            resolver.resolveToPlayableStream(stream, season = null, episode = null)
+        }
+        delay(200)
+        releaseProvider.complete(Unit)
+
+        val firstResult = first.await()
+        val secondResult = second.await()
+
+        assertEquals(1, providerCallCount.get())
+        assertTrue(firstResult is DirectDebridPlayableResult.Success)
+        assertTrue(secondResult is DirectDebridPlayableResult.Success)
+        firstResult as DirectDebridPlayableResult.Success
+        secondResult as DirectDebridPlayableResult.Success
+        assertEquals(RESOLVED_URL, firstResult.stream.url)
+        assertEquals(RESOLVED_URL, secondResult.stream.url)
     }
 
     private fun testStream(): Stream = Stream(
