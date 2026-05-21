@@ -591,6 +591,45 @@ internal fun PlayerRuntimeController.retryCurrentStreamFromStartAfter416() {
     }
 }
 
+@androidx.annotation.OptIn(UnstableApi::class)
+@OptIn(UnstableApi::class)
+internal fun PlayerRuntimeController.retryCurrentStreamFromStartAfterCueParse() {
+    if (hasRetriedCurrentStreamFromStartAfterCueParse) return
+    Log.w(PlayerRuntimeController.TAG, "Retrying current stream from position 0 after cue-parse failure")
+    hasRetriedCurrentStreamFromStartAfterCueParse = true
+    pendingResumeProgress = null
+    showRecoveryOverlay()
+    _uiState.update { it.copy(pendingSeekPosition = null) }
+    _exoPlayer?.let { player ->
+        runCatching {
+            player.stop()
+            player.clearMediaItems()
+            player.setMediaSource(
+                mediaSourceFactory.createMediaSource(
+                    context = context,
+                    url = currentStreamUrl,
+                    headers = currentHeaders,
+                    filename = currentFilename,
+                    responseHeaders = currentStreamResponseHeaders,
+                    mimeTypeOverride = currentStreamMimeType,
+                    audioDelayUsProvider = audioDelayUs::get
+                )
+            )
+            player.seekTo(0L)
+            player.playWhenReady = true
+            player.prepare()
+        }.onFailure { e ->
+            _uiState.update {
+                it.copy(
+                    error = e.toDisplayMessage(context),
+                    showLoadingOverlay = false,
+                    showPauseOverlay = false
+                )
+            }
+        }
+    }
+}
+
 internal fun PlayerRuntimeController.observeDeviceLocalAspectMode() {
     scope.launch {
         deviceLocalPlayerPreferences.aspectMode

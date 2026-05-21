@@ -603,6 +603,13 @@ internal fun PlayerRuntimeController.initializePlayer(
                             retryCurrentStreamFromStartAfter416()
                             return
                         }
+                        if (!hasRenderedFirstFrame &&
+                            error.isMatroskaCueParseFailure() &&
+                            !hasRetriedCurrentStreamFromStartAfterCueParse
+                        ) {
+                            retryCurrentStreamFromStartAfterCueParse()
+                            return
+                        }
                         if (maybeAutoSwitchInternalPlayerOnStartupError(
                                 detailedError = detailedError,
                                 allowEngineFailover = allowEngineFailover

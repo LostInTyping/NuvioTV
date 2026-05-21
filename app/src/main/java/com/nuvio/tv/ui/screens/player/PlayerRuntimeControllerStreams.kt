@@ -527,6 +527,7 @@ internal fun PlayerRuntimeController.switchToSourceStream(stream: Stream) {
         resetLoadingOverlayForNewStream()
         releasePlayer(flushPlaybackState = false)
         hasRetriedCurrentStreamAfter416 = false
+        hasRetriedCurrentStreamFromStartAfterCueParse = false
         errorRetryCount = 0
         subtitleDisabledByPersistedPreference = false
         subtitleAddonRestoredByPersistedPreference = false
@@ -605,6 +606,7 @@ internal fun PlayerRuntimeController.switchToSourceStream(stream: Stream) {
     )
     persistSelectedStreamForReuse(stream = stream, url = url, headers = newHeaders)
     hasRetriedCurrentStreamAfter416 = false
+    hasRetriedCurrentStreamFromStartAfterCueParse = false
     resetErrorRetryState()
     subtitleDisabledByPersistedPreference = false
     subtitleAddonRestoredByPersistedPreference = false
@@ -1018,6 +1020,7 @@ internal fun PlayerRuntimeController.switchToEpisodeStream(
     subtitleAddonRestoredByPersistedPreference = false
     pendingRestoredAddonSubtitle = null
     hasRetriedCurrentStreamAfter416 = false
+    hasRetriedCurrentStreamFromStartAfterCueParse = false
     resetErrorRetryState()
     currentVideoId = targetVideo?.id ?: _uiState.value.episodeStreamsForVideoId ?: currentVideoId
     currentSeason = targetVideo?.season ?: _uiState.value.episodeStreamsSeason ?: currentSeason
@@ -1106,6 +1109,7 @@ private fun PlayerRuntimeController.switchToEpisodeStreamCommon(
     subtitleAddonRestoredByPersistedPreference = false
     pendingRestoredAddonSubtitle = null
     hasRetriedCurrentStreamAfter416 = false
+    hasRetriedCurrentStreamFromStartAfterCueParse = false
     errorRetryCount = 0
     currentVideoId = targetVideo?.id ?: _uiState.value.episodeStreamsForVideoId ?: currentVideoId
     currentSeason = targetVideo?.season ?: _uiState.value.episodeStreamsSeason ?: currentSeason

@@ -103,6 +103,19 @@ internal fun isRetryablePlaybackError(error: PlaybackException): Boolean {
     }
 }
 
+internal fun PlaybackException.isMatroskaCueParseFailure(): Boolean {
+    if (errorCode != PlaybackException.ERROR_CODE_IO_UNSPECIFIED) return false
+    var current: Throwable? = this
+    while (current != null) {
+        if (current.message?.contains("varint", ignoreCase = true) == true) {
+            Log.w(PlayerRuntimeController.TAG, "Cue-parse failure detected: ${current.javaClass.simpleName}: ${current.message}")
+            return true
+        }
+        current = current.cause
+    }
+    return false
+}
+
 internal fun PlaybackException.findInvalidResponseCodeException(): HttpDataSource.InvalidResponseCodeException? {
     var current: Throwable? = cause
     while (current != null) {
